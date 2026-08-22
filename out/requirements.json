@@ -1,0 +1,328 @@
+{
+  "model_id": "gemini-3.7-flash",
+  "timestamp": "2026-08-22T15:44:19.006Z",
+  "engine": "GEMINI_CLOUD",
+  "execution_time_ms": 28476,
+  "requirements": [
+    {
+      "id": "DM-04-R01",
+      "text": "All historical allergy and adverse reaction records associated with active and archived patient master records in CareTrak PAS (approx. 1.4 million records spanning 2004–2025) shall be migrated into Aurora EPR during the cutover window.",
+      "source_file": "FDS-DM-04_Allergy_Data_Migration.md",
+      "source_line": 19,
+      "author": "David Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "DM-04-R02",
+      "text": "Legacy allergen identifiers and free-text substance labels shall undergo best-effort algorithmic matching against the UK NHS SNOMED CT drug and substance subset (release v34.1). Unmapped items shall be assigned SNOMED code 716186003 (No Known Allergy) with legacy text retained in secondary notes.",
+      "source_file": "FDS-DM-04_Allergy_Data_Migration.md",
+      "source_line": 22,
+      "author": "David Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "DM-04-R03",
+      "text": "All migrated allergy records shall be rendered immediately visible and active in the Aurora Allergy & Intolerance clinical summary panel upon initial user login at go-live.",
+      "source_file": "FDS-DM-04_Allergy_Data_Migration.md",
+      "source_line": 25,
+      "author": "David Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "DM-04-R04",
+      "text": "Allergy severity classifications (Mild, Moderate, Severe, Life-Threatening) shall be algorithmically inferred from legacy free-text clinical notes and mapped into Aurora Severity tiers using regex keyword extraction.",
+      "source_file": "FDS-DM-04_Allergy_Data_Migration.md",
+      "source_line": 28,
+      "author": "David Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "DM-04-R05",
+      "text": "The system shall preserve the original legacy recording timestamp, legacy clinician ID, and migration batch identifier for every migrated allergy entity to support medicolegal compliance.",
+      "source_file": "FDS-DM-04_Allergy_Data_Migration.md",
+      "source_line": 31,
+      "author": "David Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "DM-04-R06",
+      "text": "Where duplicate allergy entries exist for a single patient with matching substance concepts, the migration engine shall merge them into a single active record, preserving the highest recorded severity level.",
+      "source_file": "FDS-DM-04_Allergy_Data_Migration.md",
+      "source_line": 34,
+      "author": "David Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "DM-04-R07",
+      "text": "Allergy records pertaining to paediatric patients under 16 years of age shall carry a mandatory verification flag requiring secondary review at the subsequent hospital encounter.",
+      "source_file": "FDS-DM-04_Allergy_Data_Migration.md",
+      "source_line": 37,
+      "author": "David Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "DM-04-R08",
+      "text": "Any record failing structural schema validation shall be diverted to the staging exception queue for manual resolution within 72 hours of cutover completion.",
+      "source_file": "FDS-DM-04_Allergy_Data_Migration.md",
+      "source_line": 40,
+      "author": "David Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "CLIN-11-R01",
+      "text": "The Aurora Allergy & Intolerance clinical summary panel shall be unpopulated and empty at go-live for all migrated patients to ensure unverified legacy data does not compromise acute prescribing decisions.",
+      "source_file": "FDS-CLIN-11_Allergy_Capture_At_First_Appointment.md",
+      "source_line": 16,
+      "author": "Dr. Fiona Gallagher",
+      "date": "19-Feb-2026",
+      "status": "APPROVED",
+      "workstream": "Clinical Design & Patient Safety"
+    },
+    {
+      "id": "CLIN-11-R02",
+      "text": "Legacy allergy data must never populate a clinical field because the Clinical Safety Group ruled it unsafe for prescribing due to inconsistent coding and unverified dosage thresholds in legacy PAS.",
+      "source_file": "FDS-CLIN-11_Allergy_Capture_At_First_Appointment.md",
+      "source_line": 19,
+      "author": "Dr. Fiona Gallagher",
+      "date": "19-Feb-2026",
+      "status": "APPROVED",
+      "workstream": "Clinical Design & Patient Safety"
+    },
+    {
+      "id": "CLIN-11-R03",
+      "text": "Allergy and intolerance profiles must be captured directly from the patient by an authorised registered prescriber during their first physical or virtual clinical appointment post go-live.",
+      "source_file": "FDS-CLIN-11_Allergy_Capture_At_First_Appointment.md",
+      "source_line": 22,
+      "author": "Dr. Fiona Gallagher",
+      "date": "19-Feb-2026",
+      "status": "APPROVED",
+      "workstream": "Clinical Design & Patient Safety"
+    },
+    {
+      "id": "CLIN-11-R04",
+      "text": "The electronic prescribing and medicines administration (ePMA) module shall enforce a mandatory hard-stop blocking all non-emergency drug orders until point-of-care allergy reconciliation is completed by an authorised clinician.",
+      "source_file": "FDS-CLIN-11_Allergy_Capture_At_First_Appointment.md",
+      "source_line": 25,
+      "author": "Dr. Fiona Gallagher",
+      "date": "19-Feb-2026",
+      "status": "APPROVED",
+      "workstream": "Clinical Design & Patient Safety"
+    },
+    {
+      "id": "CLIN-11-R05",
+      "text": "Allergy severity and adverse reaction manifestations must be captured directly from the patient at first appointment, never inferred or derived from automated algorithms or unverified historical free-text notes.",
+      "source_file": "FDS-CLIN-11_Allergy_Capture_At_First_Appointment.md",
+      "source_line": 28,
+      "author": "Dr. Fiona Gallagher",
+      "date": "19-Feb-2026",
+      "status": "APPROVED",
+      "workstream": "Clinical Design & Patient Safety"
+    },
+    {
+      "id": "CLIN-11-R06",
+      "text": "Point-of-care captured allergies shall immediately trigger real-time drug-allergy interaction (DAI) alerts within the Aurora pharmacy engine upon confirmed clinician signing.",
+      "source_file": "FDS-CLIN-11_Allergy_Capture_At_First_Appointment.md",
+      "source_line": 31,
+      "author": "Dr. Fiona Gallagher",
+      "date": "19-Feb-2026",
+      "status": "APPROVED",
+      "workstream": "Clinical Design & Patient Safety"
+    },
+    {
+      "id": "MAP-ROW-01",
+      "text": "Map PAT_ALLERGY_ID to AUR_ALLERGY_ID with direct 1:1 GUID generation (Migrate=Y).",
+      "source_file": "DM_Field_Mapping_v7.csv",
+      "source_line": 2,
+      "author": "D. Vance",
+      "date": "12-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "MAP-ROW-02",
+      "text": "Map PAT_NHS_NUMBER to AUR_PATIENT_NHS_NO with Format ISO-13606 validation (Migrate=Y).",
+      "source_file": "DM_Field_Mapping_v7.csv",
+      "source_line": 3,
+      "author": "S. Jenkins",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "MAP-ROW-03",
+      "text": "Map ALLERGY_DESC to AUR_ALLERGEN_NAME with cleanse whitespace trim (Migrate=Y).",
+      "source_file": "DM_Field_Mapping_v7.csv",
+      "source_line": 4,
+      "author": "D. Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "MAP-ROW-04",
+      "text": "Map ALLERGEN_CODE to AUR_SNOMED_CONCEPT_ID with SNOMED CT NHS UK subset mapping (Migrate=Y).",
+      "source_file": "DM_Field_Mapping_v7.csv",
+      "source_line": 5,
+      "author": "A. Pendelton",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "MAP-ROW-05",
+      "text": "Map REACTION_TYPE to AUR_REACTION_CATEGORY with Enum mapping (Allergy|Intolerance|Adverse) (Migrate=Y).",
+      "source_file": "DM_Field_Mapping_v7.csv",
+      "source_line": 6,
+      "author": "D. Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "MAP-ROW-06",
+      "text": "Do not migrate SEVERITY_CODE to AUR_SEVERITY_LEVEL; free text derivation cancelled by Pharmacy SME (Migrate=N).",
+      "source_file": "DM_Field_Mapping_v7.csv",
+      "source_line": 7,
+      "author": "M. Brody",
+      "date": "26-Feb-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "MAP-ROW-07",
+      "text": "Map DATE_RECORDED to AUR_RECORDED_DATETIME converting DD/MM/YYYY to UTC ISO-8601 (Migrate=Y).",
+      "source_file": "DM_Field_Mapping_v7.csv",
+      "source_line": 8,
+      "author": "S. Jenkins",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "MAP-ROW-08",
+      "text": "Map RECORDING_CLINICIAN_ID to AUR_ORIGINATING_STAFF_REF via GMC/NMC master table lookup (Migrate=Y).",
+      "source_file": "DM_Field_Mapping_v7.csv",
+      "source_line": 9,
+      "author": "D. Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "MAP-ROW-09",
+      "text": "Map STATUS_FLAG to AUR_ACTIVE_STATUS (A->Active, I->Resolved) (Migrate=Y).",
+      "source_file": "DM_Field_Mapping_v7.csv",
+      "source_line": 10,
+      "author": "D. Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "MAP-ROW-10",
+      "text": "Map CLINICAL_COMMENTS to AUR_HISTORICAL_NOTES with 4000 character truncation and HTML sanitization (Migrate=Y).",
+      "source_file": "DM_Field_Migration_v7.csv",
+      "source_line": 11,
+      "author": "A. Pendelton",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "MAP-ROW-11",
+      "text": "Map VERIFICATION_STATUS to AUR_CONFIRMATION_STATE defaulting to Unconfirmed_Legacy (Migrate=Y).",
+      "source_file": "DM_Field_Mapping_v7.csv",
+      "source_line": 12,
+      "author": "D. Vance",
+      "date": "14-Jan-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "MAP-ROW-12",
+      "text": "Map WARD_LOCATION_CODE to AUR_CARE_SETTING_ID with direct lookup pending Ward Master ref (Migrate=Y).",
+      "source_file": "DM_Field_Mapping_v7.csv",
+      "source_line": 13,
+      "author": "M. Brody",
+      "date": "25-Feb-2026",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "CHAT-REQ-01",
+      "text": "Drop Row 6 (severity transformation from free text) from the active ETL payload due to prescribing risk and false high-risk/missed anaphylaxis flags.",
+      "source_file": "Teams_Export_DataMigration_Channel.txt",
+      "source_line": 4,
+      "author": "David Vance",
+      "date": "2026-02-24 09:28:15",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "CHAT-REQ-02",
+      "text": "Update Row 6 on DM_Field_Mapping_v7.csv to set Migrate=N.",
+      "source_file": "Teams_Export_DataMigration_Channel.txt",
+      "source_line": 5,
+      "author": "Marcus Brody",
+      "date": "2026-02-24 09:31:00",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "CHAT-REQ-03",
+      "text": "The scheduled joint walkthrough for Wednesday is cancelled due to trust board meeting; formal minuting skipped for now.",
+      "source_file": "Teams_Export_DataMigration_Channel.txt",
+      "source_line": 6,
+      "author": "David Vance",
+      "date": "2026-02-24 09:34:12",
+      "status": "APPROVED",
+      "workstream": "Cross-Stream Collaboration"
+    },
+    {
+      "id": "CHAT-REQ-04",
+      "text": "FDS-DM-04 needs a version bump to reflect the severity cancellation before the final sign-off audit.",
+      "source_file": "Teams_Export_DataMigration_Channel.txt",
+      "source_line": 7,
+      "author": "Sarah Jenkins",
+      "date": "2026-02-24 09:35:48",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "CHAT-REQ-05",
+      "text": "Park Row 12 ward-code mapping transformations until the legacy PAS team provides responses and an approved design specification is created.",
+      "source_file": "Teams_Export_DataMigration_Channel.txt",
+      "source_line": 9,
+      "author": "David Vance",
+      "date": "2026-02-24 09:41:04",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    },
+    {
+      "id": "CHAT-REQ-06",
+      "text": "Change request and documentation updates for FDS-DM-04 regarding DM-04-R04 cancellation shall be picked up post-dry run.",
+      "source_file": "Teams_Export_DataMigration_Channel.txt",
+      "source_line": 11,
+      "author": "Sarah Jenkins",
+      "date": "2026-02-24 09:47:11",
+      "status": "APPROVED",
+      "workstream": "Patient Data Migration & PAS Cutover"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "model_id": "gemini-3.7-flash",
+  "timestamp": "2026-08-22T15:44:19.006Z",
+  "engine": "GEMINI_CLOUD",
+  "execution_time_ms": 28476,
+  "agenda": [
+    {
+      "finding_id": "F-01",
+      "question_to_be_asked": "Does the Trust mandate pre-populating the Aurora Allergy & Intolerance clinical summary panel with 1.4 million legacy records at go-live per FDS-DM-04, or enforcing a blank panel pending point-of-care clinician reconciliation per FDS-CLIN-11?",
+      "required_attendees": [
+        "Chief Medical Information Officer (CMIO)",
+        "Clinical Safety Officer (CSO)",
+        "Lead Data Migration Architect",
+        "Lead Clinical Pharmacist",
+        "Lead Author FDS-DM-04",
+        "Lead Author FDS-CLIN-11"
+      ],
+      "evidence_pack": [
+        "FDS-DM-04_Allergy_Data_Migration.md (Line 25)",
+        "FDS-CLIN-11_Allergy_Capture_At_First_Appointment.md (Lines 16, 19)",
+        "Clinical Safety Group Ruling on Legacy PAS Allergy Ingestion Risk"
+      ],
+      "time_box_minutes": 25,
+      "downstream_milestone_impact": "Blocks Cutover Dry Run 1 ETL build freeze and prevents Clinical Safety Case DCB0160 sign-off; delay risks a 3-week slip to the Go-Live cutover date."
+    },
+    {
+      "finding_id": "F-02",
+      "question_to_be_asked": "Should automated regex keyword derivation of allergy severity from legacy free-text notes be decommissioned entirely in favour of mandatory first-appointment direct patient capture?",
+      "required_attendees": [
+        "Clinical Safety Officer (CSO)",
+        "Pharmacy SME (Eleanor / Lead Clinical Pharmacist)",
+        "Data Migration ETL Developer",
+        "Lead Clinical Informatician"
+      ],
+      "evidence_pack": [
+        "FDS-DM-04_Allergy_Data_Migration.md (Line 28: DM-04-R04)",
+        "FDS-CLIN-11_Allergy_Capture_At_First_Appointment.md (Line 28: CLIN-11-R05)",
+        "Clinical Safety Hazard Log (Severity Misclassification & Alert Fatigue Risks)"
+      ],
+      "time_box_minutes": 15,
+      "downstream_milestone_impact": "Blocks validation of the Allergy Data Transformation Pipeline; prevents signing off the End-to-End Integration Test Pack by end of Sprint 14."
+    },
+    {
+      "finding_id": "F-03",
+      "question_to_be_asked": "Who will formally log, approve, and implement Change Request CR-DM-04 to decommission Row 6 (SEVERITY_CODE) in FDS-DM-04 and align documentation with DM_Field_Mapping_v7.csv?",
+      "required_attendees": [
+        "David Vance (Migration Lead)",
+        "Arthur Pendelton (Technical Architect)",
+        "Marcus Brody (Integration Analyst)",
+        "Sarah Jenkins (Release / Documentation Lead)"
+      ],
+      "evidence_pack": [
+        "DM_Field_Mapping_v7.csv (Line 7: Row 6 SEVERITY_CODE)",
+        "Teams_Export_DataMigration_Channel.txt (Lines 4, 10)",
+        "FDS-DM-04_Allergy_Data_Migration.md (Line 28)"
+      ],
+      "time_box_minutes": 10,
+      "downstream_milestone_impact": "Causes ETL build divergence and script failure during Cutover Dry Run scheduled for next Monday, blocking ETL Code Baseline freeze."
+    },
+    {
+      "finding_id": "F-04",
+      "question_to_be_asked": "Will the Trust author an immediate Functional Design Specification for Ward Code transformations or disable Row 12 (WARD_LOCATION_CODE) migration until the Legacy PAS Ward Master cross-reference is formally ratified?",
+      "required_attendees": [
+        "Marcus Brody (Integration Analyst)",
+        "David Vance (Migration Lead)",
+        "Legacy PAS Interface Lead",
+        "Enterprise Data Architect"
+      ],
+      "evidence_pack": [
+        "DM_Field_Mapping_v7.csv (Line 13: Row 12 WARD_LOCATION_CODE)",
+        "Teams_Export_DataMigration_Channel.txt (Lines 8, 9)",
+        "Legacy PAS Ward Master Cross-Reference Table (Draft/Pending)"
+      ],
+      "time_box_minutes": 15,
+      "downstream_milestone_impact": "Triggers foreign key constraint violations and unmapped care setting records during Stage 2 Data Load, blocking Location Hierarchy sign-off."
+    },
+    {
+      "finding_id": "F-05",
+      "question_to_be_asked": "What formal governance process will be enforced to record deferred walkthrough minutes, approve pending FDS-DM-04 version bumps, and ensure audit compliance prior to Go-Live sign-off?",
+      "required_attendees": [
+        "Programme Director",
+        "Clinical Safety Officer (CSO)",
+        "Sarah Jenkins (Release / Documentation Lead)",
+        "David Vance (Migration Lead)",
+        "Quality Assurance & Compliance Lead"
+      ],
+      "evidence_pack": [
+        "Teams_Export_DataMigration_Channel.txt (Lines 6, 7, 11)",
+        "Trust Clinical Governance & DCB0160 Audit Compliance Checklist",
+        "FDS Baseline Version Log"
+      ],
+      "time_box_minutes": 15,
+      "downstream_milestone_impact": "Fails Pre-Go-Live Regulatory & Clinical Governance Audit Gate, invalidating deployment authorization and forcing an emergency Trust Review Board review."
+    }
+  ]
+}
