@@ -2,6 +2,10 @@
 
 Cross-document requirements conflict detection and stakeholder walkthrough agenda generator for large-scale enterprise and healthcare IT migrations.
 
+**[▶ Live demo](https://aurora-requirements-conflict-engine.ai.studio/)** — click *Run Analysis* to execute the full three-pass pipeline against the corpus.
+
+Validated run: **32 requirements** extracted from 4 sources, **5 findings**, **16 citations verified against source, 0 rejected**, in 23.4s on `gemini-3.7-flash`.
+
 ## The Problem
 Large organisations migrating to new platforms decompose complex workflows into hundreds of Functional Design Specifications (FDSs), reviewed over several weeks by separate workstreams. Requirements are scattered across design documents, field mapping spreadsheets, meeting minutes, and chat transcripts. Separately approved documents often contradict each other, and verbal decisions in chat never propagate back into the approved documents.
 
