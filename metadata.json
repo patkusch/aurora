@@ -1,0 +1,8 @@
+{
+  "name": "Aurora — Requirements Conflict Engine",
+  "description": "Cross-document requirements conflict detection and walkthrough agenda generator across designs, spreadsheets, and chat transcripts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

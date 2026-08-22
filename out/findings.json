@@ -1,0 +1,112 @@
+[
+  {
+    "id": "F-01",
+    "type": "CONTRADICTION",
+    "severity": "CRITICAL",
+    "title": "Direct Cross-Workstream Conflict: Allergy Record Ingestion vs Empty Panel Mandate",
+    "blast_radius_score": 98,
+    "citations": [
+      {
+        "file": "FLLD-DM-04_Allergy_Data_Migration.md",
+        "line": 27,
+        "verbatim_excerpt": "All migrated allergy records shall be rendered immediately visible and active in the Aurora Allergy & Intolerance clinical summary panel upon initial user login at go-live.",
+        "verified": true
+      },
+      {
+        "file": "FLLD-CLIN-11_Allergy_Capture_At_First_Appointment.md",
+        "line": 16,
+        "verbatim_excerpt": "The Aurora Allergy & Intolerance clinical summary panel shall be unpopulated and empty at go-live for all migrated patients to ensure unverified legacy data does not compromise acute prescribing decisions.",
+        "verified": true
+      },
+      {
+        "file": "FLLD-CLIN-11_Allergy_Capture_At_First_Appointment.md",
+        "line": 19,
+        "verbatim_excerpt": "Legacy allergy data must never populate a clinical field because the Clinical Safety Group ruled it unsafe for prescribing due to inconsistent coding and unverified dosage thresholds in legacy PAS.",
+        "verified": true
+      }
+    ],
+    "why_incompatible": "FLLD-DM-04 mandates 1.4 million legacy allergy records populate the active clinical panel at cutover, whereas FLLD-CLIN-11 (approved 5 weeks later by Clinical Safety Group) strictly mandates the panel remain empty at go-live because legacy data was deemed clinically hazardous for electronic prescribing.",
+    "consequence": "Catastrophic patient safety hazard or migration abort: Either 1.4M unverified records flood the prescriber screen triggering dangerous clinical interactions, or clinicians operate under the assumption that allergy histories are present when the panel was suppressed, violating clinical safety standards."
+  },
+  {
+    "id": "F-02",
+    "type": "VERBAL_OVERRIDE",
+    "severity": "HIGH",
+    "title": "Unpropagated Verbal Override: Free-Text Severity Derivation Cancelled in Chat and CSV but Approved in FLLD-DM-04",
+    "blast_radius_score": 85,
+    "citations": [
+      {
+        "file": "Teams_Export_DataMigration_Channel.txt",
+        "line": 2,
+        "verbatim_excerpt": "We can't derive severity from free text, it's a prescribing risk.",
+        "verified": true
+      },
+      {
+        "file": "DM_Field_Mapping_v7.csv",
+        "line": 7,
+        "verbatim_excerpt": "SEVERITY_CODE,AUR_SEVERITY_LEVEL,N,Do not migrate - free text derivation cancelled by Pharmacy SME,M. Brody,26-Feb-2026",
+        "verified": true
+      },
+      {
+        "file": "FLLD-DM-04_Allergy_Data_Migration.md",
+        "line": 30,
+        "verbatim_excerpt": "Allergy severity classifications (Mild, Moderate, Severe, Life-Threatening) shall be algorithmically inferred from legacy free-text clinical notes and mapped into Aurora Severity tiers using regex keyword extraction.",
+        "verified": true
+      }
+    ],
+    "why_incompatible": "Pharmacy SME Marcus Brody verbally cancelled severity derivation in Teams chat on 24 Feb and modified CSV Row 6 to Migrate=N on 26 Feb. However, approved design document FLLD-DM-04 still contains active requirement DM-04-R04 mandating regex derivation, creating divergence between architectural documentation and ETL implementation.",
+    "consequence": "ETL developer ambiguity and audit failure: ETL engineers referencing FLLD-DM-04 will build regex derivation parsers while mapping technicians suppress the field. The authoritative source of truth is currently an informal Teams message."
+  },
+  {
+    "id": "F-03",
+    "type": "ORPHAN_DEPENDENCY",
+    "severity": "MEDIUM",
+    "title": "Orphan Dependency: Ward-Code Location Transformation in CSV without Governing Design Document",
+    "blast_radius_score": 62,
+    "citations": [
+      {
+        "file": "DM_Field_Mapping_v7.csv",
+        "line": 13,
+        "verbatim_excerpt": "12,WARD_LOCATION_CODE,AUR_CARE_SETTING_ID,Y,Direct lookup pending Ward Master ref,M. Brody,25-Feb-2026",
+        "verified": true
+      },
+      {
+        "file": "Teams_Export_DataMigration_Channel.txt",
+        "line": 8,
+        "verbatim_excerpt": "Also noticed Row 12 has a dependency on ward-code mapping from the legacy PAS, but there is no approved design document for ward-level location translation.",
+        "verified": true
+      }
+    ],
+    "why_incompatible": "Field mapping CSV row 12 marks WARD_LOCATION_CODE as active for migration with a dependency on Ward Master references, but no functional low-level design document specifies the translation rules or lookup fallbacks.",
+    "consequence": "Runtime ETL transformation failure on inpatient records with unmapped historical ward codes, causing allergy entries to reject or attach to invalid clinical care settings."
+  },
+  {
+    "id": "F-04",
+    "type": "GOVERNANCE_GAP",
+    "severity": "LOW",
+    "title": "Unowned Governance Action: FLLD-DM-04 Version Bump Omitted After Cancelled Walkthrough",
+    "blast_radius_score": 41,
+    "citations": [
+      {
+        "file": "Teams_Export_DataMigration_Channel.txt",
+        "line": 6,
+        "verbatim_excerpt": "The scheduled joint walkthrough for Wednesday is cancelled due to the trust board meeting, so we will skip formal minuting for now.",
+        "verified": true
+      },
+      {
+        "file": "Teams_Export_DataMigration_Channel.txt",
+        "line": 7,
+        "verbatim_excerpt": "Note that DM-04 needs a version bump to reflect the severity cancellation before the final sign-off audit.",
+        "verified": true
+      },
+      {
+        "file": "Teams_Export_DataMigration_Channel.txt",
+        "line": 11,
+        "verbatim_excerpt": "Not yet, everyone is flat out on the cutover dry run. We'll pick up doc updates post-dry run.",
+        "verified": true
+      }
+    ],
+    "why_incompatible": "Joint stakeholder walkthrough was cancelled, resulting in informal agreement to postpone formal documentation changes. No change request was raised or assigned to update FLLD-DM-04 before dry run execution.",
+    "consequence": "Audit non-compliance during regulatory cutover readiness gate and risk of regression in subsequent migration iterations."
+  }
+]
