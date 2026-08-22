@@ -7,11 +7,25 @@
 **Two design documents. Both approved. Five weeks apart. Mutually exclusive.**
 **Nobody noticed — because nobody reads every document.**
 
-[![Live Demo](https://img.shields.io/badge/▶_Live_Demo-F27D26?style=for-the-badge)](https://aurora-requirements-conflict-engine.ai.studio/)
+<br/>
+
+## ▶ [**TRY THE LIVE DEMO**](https://aurora-requirements-conflict-engine.ai.studio/)
+
+### [aurora-requirements-conflict-engine.ai.studio](https://aurora-requirements-conflict-engine.ai.studio/)
+
+**No setup, no API key, no install.** Open it and press **RUN ANALYSIS**.
+
+<br/>
+
 [![Model](https://img.shields.io/badge/Gemini_3.7_Flash-1A1A1A?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![License](https://img.shields.io/badge/License-MIT-1A1A1A?style=for-the-badge)](./LICENSE)
+[![Status](https://img.shields.io/badge/citations-verified_in_code-2ea043?style=for-the-badge)](#why-you-can-trust-the-citations)
 
 </div>
+
+---
+
+![Aurora dashboard](./docs/dashboard.png)
 
 ---
 
@@ -27,49 +41,106 @@ A hospital is migrating a million patient records to a new platform. Two teams w
 
 Both passed governance. Different workstreams, different reviewers, no shared approver. At cutover, either 1.4 million allergy records land in a panel the Clinical Safety Group ruled unsafe for prescribing — or the panel is empty and the reconciliation report expects it populated.
 
-**Aurora finds this in 23 seconds, and cites both lines.**
+**Aurora finds this in under 30 seconds, and cites both lines.**
 
 ---
 
-## What it actually produces
+# How the dashboard works
 
-Not a document. Not a lint report. **The agenda for the next stakeholder walkthrough** — the ranked list of decisions that need a human in a room, each with the question to ask, who needs to be there, the evidence pack, a time box, and the milestone that slips if it isn't resolved.
+In plain language: **you press one button, and the screen fills up with the arguments your team is about to have.**
+
+The layout is three columns, left to right — *what went in*, *what's wrong*, *how we know*.
+
+### Before you press anything
+
+The app opens showing a previous run, so it's never a blank screen. Nothing has been sent anywhere yet.
+
+### Press **RUN ANALYSIS** (top right)
+
+A progress bar walks through three stages, roughly 25 seconds in total:
+
+| Stage | What's happening |
+|:--|:--|
+| **Pass 1 — Extraction** | Reads all four files and pulls out every individual requirement — including the ones buried in chat messages |
+| **Pass 2 — Detection** | Holds all of them in mind at once and works out which ones can't both be true |
+| **Pass 3 — Agenda** | Turns each conflict into a meeting item: the question, who's needed, how long it'll take |
+
+Then a green line appears: *"Analysis complete in 24.89s. 17 citations verified."*
+
+### Column 1 — CORPUS *(what went in)*
+
+The four source files, with their line counts and dates. **Click any file** to read it in the panel below, with line numbers down the side. This is the raw material — two approved design specifications from different teams, a field mapping spreadsheet, and an exported Teams chat.
+
+The chat file matters more than it looks. Decisions get made in chat and never make it back into the official document, and Aurora treats a chat message as just as real a requirement as a numbered clause in a signed-off spec.
+
+### Column 2 — FINDINGS *(what's wrong)*
+
+Every conflict found, **ranked by blast radius** — how much damage it does if nobody catches it. Patient safety sorts above paperwork problems.
+
+Each card shows a coloured severity bar and a **Radius** score out of 100. Red is a safety-critical contradiction, amber is a high-risk process failure, blue and green are dependency and governance gaps. **Click any card** to open it.
+
+### Column 3 — EVIDENCE PACK *(how we know)*
+
+This is the column that makes it a tool rather than a chatbot.
+
+- **Verified source citations** — each one shows the exact file and line (`FDS-DM-04...MD:L25`), the sentence quoted word for word, and a green **VERIFIED** tick. That tick means the quote was checked against the real file *in code*. Nothing unverified is displayed.
+- **Incompatibility** — why the two requirements can't both be satisfied, in one paragraph.
+- **Consequence** — what actually happens to patients or to the programme if it isn't resolved.
+- **Walkthrough agenda item** *(the black block at the bottom)* — the question to put to the room, who needs to be there by job title, an estimated time box, and the milestone that slips.
+
+### The header counters
+
+`CITATIONS: 17 VERIFIED / 0 REJECTED` is the honesty meter. If the model had invented a quote, it would appear in the rejected count and never reach the screen.
+
+`EXTRACTED: 31 REQS` is how many individual requirements were pulled out of the four files.
+
+### **Export**
+
+Downloads three JSON files — `requirements.json`, `findings.json`, `agenda.json` — for feeding into Jira, a change request, or the actual meeting invite. Sample output is committed in [`out/`](./out).
+
+---
+
+## The finding that matters most
+
+![Evidence trail for the verbal override](./docs/evidence-trail.png)
+
+**F-03** is the one experienced programme people react to. A pharmacy SME cancelled a requirement **verbally, in a Teams message**, on 24 February. It reached the field mapping spreadsheet two days later. It never reached the approved design document.
+
+Look at the citations in the screenshot: a chat message, a spreadsheet row, and a design document clause — three different file formats, one contradiction between them. The source of truth for that field is currently a chat message from February, and the approved specification still instructs developers to build the opposite.
+
+---
+
+## What it produces
+
+Not a document. Not a lint report. **The agenda for the next stakeholder walkthrough.**
 
 > *The model doesn't replace the walkthrough. It writes the agenda for it.*
 
-## Validated run
-
-| | |
-|:--|:--|
-| **Requirements extracted** | **32** across 4 heterogeneous sources |
-| **Findings surfaced** | **5** — ranked by blast radius |
-| **Citations verified against source** | **16 verified · 0 rejected** |
-| **Wall clock** | **23.4s** |
-| **Model** | `gemini-3.7-flash` |
-
-Validated against a synthetic corpus containing two planted defects and two secondary signals. All four were identified. Raw output is committed in [`out/`](./out).
-
-### What it found
+### Findings from a representative run
 
 | ID | Type | Severity | Blast radius |
 |:--|:--|:--|--:|
 | **F-01** | Cross-workstream contradiction — panel populated vs mandatory empty | `CRITICAL` | 98 |
 | **F-02** | Algorithmic severity derivation prohibited by Clinical Safety Group | `CRITICAL` | 92 |
-| **F-03** | Verbal override — cancelled in chat, reached the CSV, never reached the spec | `HIGH` | 85 |
-| **F-04** | Orphan dependency — ward-code mapping with no governing specification | `MEDIUM` | 74 |
-| **F-05** | Governance gap — walkthrough cancelled, unminuted, version bump unowned | `MEDIUM` | 62 |
+| **F-03** | Verbal override — cancelled in chat, reached the CSV, never reached the spec | `HIGH` | 82 |
+| **F-04** | Orphan dependency — ward-code mapping with no governing specification | `MEDIUM` | 65 |
+| **F-05** | Governance gap — walkthrough cancelled, unminuted, version bump unowned | `MEDIUM` | 48 |
 
-F-03 is the one that matters most in practice. A pharmacy SME killed a requirement **verbally, in a Teams message**. It propagated to the field mapping sheet. It never propagated back to the approved design document. The source of truth for that field is currently a chat message from February.
+Validated against a synthetic corpus containing two planted defects and two secondary signals. **All four were identified on every run.**
+
+Because extraction is generative, exact counts move slightly between runs — observed across three consecutive runs: **31–32 requirements**, **15–17 citations**, **24–28 seconds**, and **5 findings with 0 citations rejected every time**. The committed artifacts in [`out/`](./out) are one specific run, not an average.
 
 ---
 
-## Why the citations are trustworthy
+## Why you can trust the citations
 
 This is the part that makes it a tool rather than a plausible-sounding text generator.
 
 **Every line of the corpus is prefixed with `FILENAME:LINENO| ` before it ever reaches the model.** That prefix is the entire provenance mechanism.
 
-Then — critically — **citation verification runs in code, not in the prompt.** Each `{file, line, verbatim_excerpt}` is looked up against the original source text. If the excerpt isn't there, the finding is discarded before it reaches the UI. The header shows the live count: *16 verified, 0 rejected.*
+Then — critically — **citation verification runs in code, not in the prompt.** Each `{file, line, verbatim_excerpt}` is looked up against the original source text. If the excerpt isn't there, the finding is discarded before it reaches the UI.
+
+![Verification counters](./docs/header-verification.png)
 
 A finding without a resolvable citation is treated as a hallucination, not a result. That was a design constraint, not a discovery.
 
@@ -105,13 +176,13 @@ flowchart TB
   V -->|"unresolvable"| X["Discarded as hallucination"]
 ```
 
-### Why every requirement is in context simultaneously
+### Why there is no retrieval step
 
-There is deliberately **no retrieval step**. The finding *is* the relationship between two documents — retrieval would surface the relevant one, but the problem is precisely that neither author knew the other document existed. Conflict detection is a whole-corpus operation, which is what a large context window is genuinely good for and what a human reviewer structurally cannot do.
+Deliberately **no RAG**. The finding *is* the relationship between two documents — retrieval would surface the relevant one, but the problem is precisely that neither author knew the other document existed. Conflict detection is a whole-corpus operation, which is what a large context window is genuinely good for and what a human reviewer structurally cannot do.
 
 ---
 
-## Quickstart
+## Run it yourself
 
 **Prerequisites** — Node.js 18+ and a Gemini API key.
 
@@ -149,9 +220,19 @@ npm run analyse
 
 ---
 
-## Corpus
+## The corpus
 
-Fully synthetic, authored from scratch. No real client data. The demo domain is Meridian Health NHS Foundation Trust migrating from a legacy PAS to a new EPR — four artefacts covering the allergy-records slice of a patient data migration: two approved design specifications from different workstreams, a twelve-row field mapping sheet, and a Teams channel export.
+Fully synthetic, authored from scratch. **No real client data.** The demo domain is Meridian Health NHS Foundation Trust migrating from a legacy PAS to a new EPR — four artefacts covering the allergy-records slice of a patient data migration: two approved design specifications from different workstreams, a twelve-row field mapping sheet, and a Teams channel export.
+
+<div align="center">
+
+<br/>
+
+## ▶ [**TRY THE LIVE DEMO**](https://aurora-requirements-conflict-engine.ai.studio/)
+
+<br/>
+
+</div>
 
 ## License
 
