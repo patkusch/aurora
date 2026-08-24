@@ -1,4 +1,4 @@
-import { CorpusFile, AnalysisResults, Citation } from '../types';
+import { CorpusFile, AnalysisResults, Citation, Requirement } from '../types';
 
 export const CORPUS_FILES: Record<string, CorpusFile> = {
   'FDS-DM-04_Allergy_Data_Migration.md': {
@@ -190,6 +190,22 @@ export function verifyCitationAgainstSource(citation: Citation): { verified: boo
 }
 
 /**
+ * Programmatically verify an extracted requirement's provenance.
+ *
+ * Pass 2 findings are verified by their quoted excerpt; Pass 1 requirements are
+ * paraphrases, so there is no excerpt to match. What can still be checked
+ * deterministically is that the file exists and the line is real — which is
+ * enough to catch an invented filename or a line number past the end of a file.
+ */
+export function verifyRequirementSource(req: Requirement): boolean {
+  const file = CORPUS_FILES[req.source_file];
+  if (!file) return false;
+
+  const lineCount = file.content.split('\n').length;
+  return Number.isInteger(req.source_line) && req.source_line >= 1 && req.source_line <= lineCount;
+}
+
+/**
  * Pre-baked sample results for instant UI loading and demo safety.
  */
 export const SAMPLE_RESULTS: AnalysisResults = {
@@ -199,6 +215,8 @@ export const SAMPLE_RESULTS: AnalysisResults = {
   execution_time_ms: 1840,
   citations_verified: 9,
   citations_rejected: 0,
+  requirements_verified: 11,
+  requirements_unverified: 0,
   warnings: [],
   requirements: [
     {

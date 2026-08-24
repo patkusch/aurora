@@ -1,5 +1,5 @@
 import { AnalysisResults, Citation, Finding, Requirement, AgendaItem, PipelineStageState } from '../types';
-import { CORPUS_FILES, getPrefixedCorpus, verifyCitationAgainstSource, SAMPLE_RESULTS } from '../data/corpus';
+import { CORPUS_FILES, getPrefixedCorpus, verifyCitationAgainstSource, verifyRequirementSource, SAMPLE_RESULTS } from '../data/corpus';
 
 export interface RunPipelineOptions {
   useLocalGemma?: boolean;
@@ -57,6 +57,23 @@ export async function runAnalysisPipeline(options: RunPipelineOptions = {}): Pro
       progress_percent: 95
     });
 
+    // Verify Pass 1 provenance: every extracted requirement must point at a
+    // file and line that actually exist. Flagged rather than dropped — an
+    // unresolvable source makes the requirement untrustworthy, not absent.
+    let requirementsVerified = 0;
+    let requirementsUnverified = 0;
+
+    const checkedRequirements: Requirement[] = (data.requirements || []).map(req => {
+      const ok = verifyRequirementSource(req);
+      if (ok) {
+        requirementsVerified++;
+      } else {
+        requirementsUnverified++;
+        console.warn(`Provenance validation failed for requirement ${req.id} — no such line: ${req.source_file}:${req.source_line}`);
+      }
+      return { ...req, provenance_verified: ok };
+    });
+
     // Run programmatic citation verification in browser
     let verifiedCount = 0;
     let rejectedCount = 0;
@@ -105,9 +122,12 @@ export async function runAnalysisPipeline(options: RunPipelineOptions = {}): Pro
 
     return {
       ...data,
+      requirements: checkedRequirements,
       findings: validatedFindings,
       citations_verified: verifiedCount,
       citations_rejected: rejectedCount,
+      requirements_verified: requirementsVerified,
+      requirements_unverified: requirementsUnverified,
       execution_time_ms: duration
     };
 

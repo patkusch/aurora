@@ -248,6 +248,26 @@ Return ONLY a valid JSON array of agenda items matching the findings:
 
     agenda = parseLenientJson(pass3Response.text || '', []);
 
+    // Stabilise finding IDs. The model assigns F-01.. in whatever order it
+    // emits, so the same conflict can be F-02 on one run and F-03 on the next —
+    // which makes IDs useless for citing in docs or a live demo. Sort by blast
+    // radius and reassign, then remap the agenda's finding_id references so the
+    // two stay in step.
+    findings.sort((a, b) => (b?.blast_radius_score ?? 0) - (a?.blast_radius_score ?? 0));
+
+    const idRemap = new Map<string, string>();
+    findings = findings.map((finding, index) => {
+      const stableId = `F-${String(index + 1).padStart(2, '0')}`;
+      if (finding?.id && finding.id !== stableId) idRemap.set(finding.id, stableId);
+      return { ...finding, id: stableId };
+    });
+
+    agenda = agenda.map((item: any) =>
+      item?.finding_id && idRemap.has(item.finding_id)
+        ? { ...item, finding_id: idRemap.get(item.finding_id) }
+        : item
+    );
+
     const duration = Date.now() - startTime;
 
     return res.json({

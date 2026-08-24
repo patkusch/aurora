@@ -17,6 +17,8 @@ export interface Requirement {
   date: string;
   status: 'APPROVED' | 'DRAFT' | 'VERBAL_PROPOSAL' | 'UNRECORDED';
   workstream: string;
+  /** Set by programmatic verification: does source_file:source_line actually exist? */
+  provenance_verified?: boolean;
 }
 
 export interface Finding {
@@ -46,6 +48,8 @@ export interface AnalysisResults {
   execution_time_ms: number;
   citations_verified: number;
   citations_rejected: number;
+  requirements_verified: number;
+  requirements_unverified: number;
   warnings: string[];
   requirements: Requirement[];
   findings: Finding[];
