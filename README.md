@@ -9,11 +9,12 @@
 
 <br/>
 
-## ▶ [**TRY THE LIVE DEMO**](https://aurora-requirements-conflict-engine.ai.studio/)
+## ▶ [**WATCH THE 75-SECOND DEMO**](./docs/aurora-demo.mp4)
 
-### [aurora-requirements-conflict-engine.ai.studio](https://aurora-requirements-conflict-engine.ai.studio/)
+**A real run, start to finish** — the two contradicting documents, the corpus,
+the pipeline executing, and both findings with their evidence trails.
 
-**No setup, no API key, no install.** Open it and press **RUN ANALYSIS**.
+Or [**run it yourself**](#run-it-yourself) — three commands, verified end to end.
 
 <br/>
 
@@ -184,6 +185,11 @@ Deliberately **no RAG**. The finding *is* the relationship between two documents
 
 ## Run it yourself
 
+Every step below was executed against a clean checkout: `npm install` (0 vulnerabilities),
+`tsc --noEmit` (no type errors), the production build, and the dev server answering
+HTTP 200 on port 3000. Without a key, `npm run analyse` exits with a plain
+`GEMINI_API_KEY environment variable is not set` rather than a stack trace.
+
 **Prerequisites** — Node.js 18+ and a Gemini API key.
 
 ```bash
@@ -228,7 +234,7 @@ Fully synthetic, authored from scratch. **No real client data.** The demo domain
 
 <br/>
 
-## ▶ [**TRY THE LIVE DEMO**](https://aurora-requirements-conflict-engine.ai.studio/)
+## ▶ [**WATCH THE DEMO**](./docs/aurora-demo.mp4) &nbsp;·&nbsp; [**RUN IT YOURSELF**](#run-it-yourself)
 
 <br/>
 
