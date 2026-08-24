@@ -20,7 +20,7 @@
 
 [![Model](https://img.shields.io/badge/Gemini_3.7_Flash-1A1A1A?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![License](https://img.shields.io/badge/License-MIT-1A1A1A?style=for-the-badge)](./LICENSE)
-[![Status](https://img.shields.io/badge/citations-verified_in_code-2ea043?style=for-the-badge)](#why-you-can-trust-the-citations)
+[![Status](https://img.shields.io/badge/provenance-verified_in_code-2ea043?style=for-the-badge)](#what-is-verified-and-what-isnt)
 
 </div>
 
@@ -123,23 +123,38 @@ Not a document. Not a lint report. **The agenda for the next stakeholder walkthr
 | **F-04** | Orphan dependency — ward-code mapping with no governing specification | `MEDIUM` | 65 |
 | **F-05** | Governance gap — walkthrough cancelled, unminuted, version bump unowned | `MEDIUM` | 48 |
 
-Validated against a synthetic corpus containing two planted defects and two secondary signals. **All four were identified on every run.**
+Run against a synthetic corpus containing two planted defects and two secondary signals. **All four were identified on every run** — which demonstrates recall. Precision is unmeasured; see [what has not been measured](#what-has-not-been-measured).
 
 Because extraction is generative, exact counts move slightly between runs — observed across three consecutive runs: **31–32 requirements**, **15–17 citations**, **24–28 seconds**, and **5 findings with 0 citations rejected every time**. The committed artifacts in [`out/`](./out) are one specific run, not an average.
 
 ---
 
-## Why you can trust the citations
+## What is verified, and what isn't
 
-This is the part that makes it a tool rather than a plausible-sounding text generator.
+This is the part that makes it a tool rather than a plausible-sounding text generator — but it is worth being precise about the boundary, because a verification claim that overreaches is worse than none.
 
 **Every line of the corpus is prefixed with `FILENAME:LINENO| ` before it ever reaches the model.** That prefix is the entire provenance mechanism.
 
-Then — critically — **citation verification runs in code, not in the prompt.** Each `{file, line, verbatim_excerpt}` is looked up against the original source text. If the excerpt isn't there, the finding is discarded before it reaches the UI.
+Then — critically — **verification runs in code, not in the prompt.** Each `{file, line, verbatim_excerpt}` is looked up against the original source text, and each extracted requirement's `source_file:source_line` is confirmed to exist. Anything that doesn't resolve is rejected or flagged before it reaches the interface.
 
 ![Verification counters](./docs/header-verification.png)
 
-A finding without a resolvable citation is treated as a hallucination, not a result. That was a design constraint, not a discovery.
+### The boundary
+
+| Claim | Status |
+|:--|:--|
+| The quoted excerpt appears at the line it cites | **Verified in code.** Mismatches are rejected. |
+| The requirement was extracted from a file and line that exist | **Verified in code.** Mismatches are flagged. |
+| The two cited requirements are genuinely incompatible | **Not verified.** This is the model's reasoning. |
+| The blast radius score is calibrated | **Not verified.** It is a model-assigned heuristic. |
+
+So `16 SOURCE-VERIFIED / 0 REJECTED` means *no quote was fabricated or misattributed*. It does **not** mean *every conflict is real*. A finding can carry two perfectly verified citations and still reason incorrectly about them — which is why the interface labels the incompatibility argument `model reasoning · unverified`, and why the output is an agenda rather than a decision.
+
+That boundary is the product thesis, not a caveat bolted onto it. Verifying provenance is a machine's job. Adjudicating whether two approved requirements can coexist is the walkthrough's, and the tool exists to get the right people into that room with the evidence already assembled.
+
+### What has not been measured
+
+Every reported run was against a corpus authored to contain known defects, which demonstrates recall and says nothing about precision. There is no control corpus without a planted conflict, so the false-positive rate is unmeasured. For a tool whose value is a shorter review cycle, precision is the number that matters most — an agenda padded with spurious items costs more attention than it saves. Measuring it is the next piece of work, ahead of any new feature.
 
 ---
 

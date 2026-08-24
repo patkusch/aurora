@@ -53,9 +53,12 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Middle Status Indicators (Sleek Telemetry) */}
       <div className="hidden md:flex items-center gap-4 text-[10px] uppercase tracking-wider text-gray-500 font-mono">
-        <div className="flex items-center gap-1">
+        <div
+          className="flex items-center gap-1"
+          title="Each excerpt was matched against the source line it cites. This proves the quote is real; it does not prove the two requirements are incompatible — that judgement is the walkthrough's."
+        >
           <span>Citations:</span>
-          <span className="text-emerald-400 font-bold">{verifiedCitations} Verified</span>
+          <span className="text-emerald-400 font-bold">{verifiedCitations} Source-Verified</span>
           <span className="text-gray-600">/</span>
           <span className={rejectedCitations > 0 ? 'text-rose-400 font-bold' : 'text-gray-600'}>
             {rejectedCitations} Rejected

@@ -63,7 +63,7 @@ export const EvidencePanel: React.FC<EvidencePanelProps> = ({
         {/* Citations Section */}
         <div className="space-y-3">
           <div className="text-[9px] uppercase tracking-wider text-gray-500 font-bold">
-            Verified Source Citations ({finding.citations?.length || 0})
+            Source-Verified Citations ({finding.citations?.length || 0})
           </div>
 
           <div className="space-y-2.5">
@@ -87,9 +87,12 @@ export const EvidencePanel: React.FC<EvidencePanelProps> = ({
                       </div>
 
                       {cit.verified !== false ? (
-                        <span className="text-[8px] text-emerald-400 bg-emerald-950/40 px-1 py-0.2 border border-emerald-800/40 flex items-center gap-0.5">
+                        <span
+                          className="text-[8px] text-emerald-400 bg-emerald-950/40 px-1 py-0.2 border border-emerald-800/40 flex items-center gap-0.5"
+                          title="This excerpt was matched against the line it cites in the source file."
+                        >
                           <CheckCircle2 className="w-2.5 h-2.5" />
-                          VERIFIED
+                          SOURCE-VERIFIED
                         </span>
                       ) : (
                         <span className="text-[8px] text-rose-400 bg-rose-950/40 px-1 py-0.2 border border-rose-800/40 flex items-center gap-0.5">
@@ -112,8 +115,14 @@ export const EvidencePanel: React.FC<EvidencePanelProps> = ({
         {/* Incompatibility & Consequence 2-Column Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#222]">
           <div>
-            <div className="text-[9px] text-gray-500 uppercase font-bold mb-1">
-              Incompatibility
+            <div className="text-[9px] text-gray-500 uppercase font-bold mb-1 flex items-center gap-1.5">
+              <span>Incompatibility</span>
+              <span
+                className="text-[8px] normal-case font-normal text-amber-500/80 border border-amber-800/40 bg-amber-950/30 px-1"
+                title="The quoted excerpts above were checked against their source lines. The claim that they are incompatible is the model's reasoning and has not been verified — that is what the walkthrough is for."
+              >
+                model reasoning · unverified
+              </span>
             </div>
             <p className="text-[11px] leading-relaxed text-[#D1D1D1] font-sans">
               {finding.why_incompatible}
