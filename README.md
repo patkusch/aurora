@@ -9,10 +9,12 @@
 
 <br/>
 
-![Aurora finding a cross-document contradiction](./docs/aurora-demo.gif)
+## ▶ [**WATCH THE DEMO**](https://youtu.be/jUWgWC1lm7w) &nbsp;·&nbsp; 75 seconds
+
+[![Aurora finding a cross-document contradiction](./docs/aurora-demo.gif)](https://youtu.be/jUWgWC1lm7w)
 
 **A real run.** Both conflicts, cited to the exact file and line.
-[Full 75-second recording](./docs/aurora-demo.mp4) · [Run it yourself](#run-it-yourself)
+[Watch on YouTube](https://youtu.be/jUWgWC1lm7w) · [Run it yourself](#run-it-yourself)
 
 <br/>
 
@@ -228,7 +230,7 @@ Fully synthetic, authored from scratch. **No real client data.** The demo domain
 
 <br/>
 
-## ▶ [**WATCH THE DEMO**](./docs/aurora-demo.mp4) &nbsp;·&nbsp; [**RUN IT YOURSELF**](#run-it-yourself)
+## ▶ [**WATCH THE DEMO**](https://youtu.be/jUWgWC1lm7w) &nbsp;·&nbsp; [**RUN IT YOURSELF**](#run-it-yourself)
 
 <br/>
 
