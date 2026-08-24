@@ -9,12 +9,10 @@
 
 <br/>
 
-## ▶ [**WATCH THE 75-SECOND DEMO**](./docs/aurora-demo.mp4)
+![Aurora finding a cross-document contradiction](./docs/aurora-demo.gif)
 
-**A real run, start to finish** — the two contradicting documents, the corpus,
-the pipeline executing, and both findings with their evidence trails.
-
-Or [**run it yourself**](#run-it-yourself) — three commands, verified end to end.
+**A real run.** Both conflicts, cited to the exact file and line.
+[Full 75-second recording](./docs/aurora-demo.mp4) · [Run it yourself](#run-it-yourself)
 
 <br/>
 
@@ -23,10 +21,6 @@ Or [**run it yourself**](#run-it-yourself) — three commands, verified end to e
 [![Status](https://img.shields.io/badge/citations-verified_in_code-2ea043?style=for-the-badge)](#why-you-can-trust-the-citations)
 
 </div>
-
----
-
-![Aurora dashboard](./docs/dashboard.png)
 
 ---
 
