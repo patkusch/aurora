@@ -7,7 +7,9 @@ import { createServer as createViteServer } from 'vite';
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+// Hosting platforms (Render, Railway, Fly, Cloud Run) inject the port to bind
+// and health-check against it, so this must not be hardcoded.
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -55,7 +57,7 @@ function parseLenientJson<T>(rawText: string, fallback: T): T {
 function getGeminiClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error('GEMINI_API_KEY environment variable is not configured. Please set your Gemini API key in the Secrets panel.');
+    throw new Error('GEMINI_API_KEY is not set. Add it to .env locally, or as an environment variable on your host.');
   }
   return new GoogleGenAI({
     apiKey,

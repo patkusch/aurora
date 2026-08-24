@@ -223,6 +223,34 @@ To run the pipeline headlessly and write the JSON artifacts to `out/`:
 npm run analyse
 ```
 
+## Deploy it
+
+The app is a single Node process: an Express server that serves the built
+frontend and holds the Gemini key server-side, so the key is never shipped to
+the browser. It binds to `$PORT`, which every mainstream host injects.
+
+**One consideration governs the choice of host:** an analysis run takes 25–30
+seconds. Platforms that cap serverless function execution below that (Vercel
+Hobby, Netlify Functions) will time out mid-pipeline unless the passes are
+restructured. A persistent process has no such limit.
+
+[`render.yaml`](./render.yaml) is committed, so on Render it is: New → Blueprint,
+point at this repo, set `GEMINI_API_KEY` in the dashboard. The free plan idles
+after inactivity and takes roughly 50 seconds to wake — acceptable, because the
+interface renders cached results immediately on load rather than showing a blank
+screen while the server starts.
+
+[`Dockerfile`](./Dockerfile) is also committed for Fly.io, Railway, Cloud Run or
+any container host. Those keep the process warm, which is worth it if the link
+is being handed to someone.
+
+```bash
+docker build -t aurora . && docker run -p 3000:3000 -e GEMINI_API_KEY=... aurora
+```
+
+Set `GEMINI_API_KEY` as an environment variable on the host. Never commit it —
+`.gitignore` already excludes `.env*`.
+
 ---
 
 ## Roadmap

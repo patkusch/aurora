@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: aurora-requirements-conflict-engine
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      # Set this in the Render dashboard — never commit the value.
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: NODE_VERSION
+        value: "20"
