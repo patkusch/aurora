@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type check
+        run: npm run lint
+
+      - name: Corpus provenance is consistent across app and CLI
+        run: npm run check:corpus
+
+      - name: Production build
+        run: npm run build
+
+      - name: Server boots and serves the built app
+        run: |
+          NODE_ENV=production PORT=3100 node dist/server.cjs &
+          for i in $(seq 1 20); do
+            curl -sf -o /dev/null http://localhost:3100/ && break
+            sleep 1
+          done
+          curl -sf -o /dev/null -w 'root %{http_code}\n' http://localhost:3100/
+          curl -sf -o /dev/null -w 'spa fallback %{http_code}\n' http://localhost:3100/deep/route
+
+      - name: No API key committed
+        run: |
+          if git grep -InE 'AIza[0-9A-Za-z_-]{20,}' -- . ':!package-lock.json'; then
+            echo "::error::A Google API key appears to be committed."
+            exit 1
+          fi
+          echo "No API key found in tracked files."

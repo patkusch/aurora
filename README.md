@@ -21,6 +21,7 @@
 [![Model](https://img.shields.io/badge/Gemini_3.7_Flash-1A1A1A?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![License](https://img.shields.io/badge/License-MIT-1A1A1A?style=for-the-badge)](./LICENSE)
 [![Status](https://img.shields.io/badge/provenance-verified_in_code-2ea043?style=for-the-badge)](#what-is-verified-and-what-isnt)
+[![CI](https://github.com/patkusch/aurora/actions/workflows/ci.yml/badge.svg)](https://github.com/patkusch/aurora/actions/workflows/ci.yml)
 
 </div>
 

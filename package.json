@@ -9,7 +9,8 @@
     "start": "node dist/server.cjs",
     "analyse": "node analyse.js",
     "clean": "rm -rf dist server.cjs",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "check:corpus": "node scripts/check-corpus-sync.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
