@@ -302,7 +302,9 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*all', (req, res) => {
+    // Express 4 wildcard. ('*all' is Express 5 syntax and matches nothing here,
+    // which made every non-root path 404 instead of falling back to the SPA.)
+    app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
