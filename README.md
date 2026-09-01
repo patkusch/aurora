@@ -21,6 +21,7 @@
 [![Model](https://img.shields.io/badge/Gemini_3.7_Flash-1A1A1A?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![License](https://img.shields.io/badge/License-MIT-1A1A1A?style=for-the-badge)](./LICENSE)
 [![Status](https://img.shields.io/badge/provenance-verified_in_code-2ea043?style=for-the-badge)](#what-is-verified-and-what-isnt)
+[![Tests](https://img.shields.io/badge/verifier_tests-22-2ea043?style=for-the-badge)](#the-verifier-is-itself-tested--and-it-was-wrong)
 [![CI](https://github.com/patkusch/aurora/actions/workflows/ci.yml/badge.svg)](https://github.com/patkusch/aurora/actions/workflows/ci.yml)
 
 </div>
@@ -152,6 +153,32 @@ Then — critically — **verification runs in code, not in the prompt.** Each `
 So `16 SOURCE-VERIFIED / 0 REJECTED` means *no quote was fabricated or misattributed*. It does **not** mean *every conflict is real*. A finding can carry two perfectly verified citations and still reason incorrectly about them — which is why the interface labels the incompatibility argument `model reasoning · unverified`, and why the output is an agenda rather than a decision.
 
 That boundary is the product thesis, not a caveat bolted onto it. Verifying provenance is a machine's job. Adjudicating whether two approved requirements can coexist is the walkthrough's, and the tool exists to get the right people into that room with the evidence already assembled.
+
+### The verifier is itself tested — and it was wrong
+
+A verification claim is only worth what the verifier is worth, so it now has a suite of
+its own (`npm test`, 22 cases, in CI). Most of them are attempts to get a fabricated
+citation past it: invented filenames, lines past end-of-file, line 0, quotes that
+appear nowhere, and one invented sentence swept across **every line of every file** with
+the assertion that nothing accepts it.
+
+Writing them found two real defects, both fixed:
+
+- **A fabricated quote verified against any blank line.** The check was containment in
+  either direction, and `anything.includes("")` is true — so with the corpus being
+  markdown, and markdown being mostly blank lines, a quote nobody wrote came back
+  `verified: true` wherever it pointed at one. An empty excerpt had the mirror problem
+  and verified against every line in the corpus. Both are now rejected outright.
+- **The pre-baked demo understated itself.** `SAMPLE_RESULTS` hardcoded
+  `citations_verified: 9` while the verifier actually confirms 11 — a number that
+  drifted when a fourth finding was added and was never recomputed. A test now asserts
+  the displayed counts against what the verifier returns, so the header cannot disagree
+  with the code again.
+
+The suite also pins the thing that would break everything silently: every line of the
+prefixed `FILENAME:LINENO| ` corpus the model is shown must round-trip through the
+verifier. If those two ever disagreed, every citation would be off by one — correct
+quotes rejected, shifted ones accepted.
 
 ### What has not been measured
 

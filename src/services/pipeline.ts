@@ -1,4 +1,4 @@
-import { AnalysisResults, Citation, Finding, Requirement, AgendaItem, PipelineStageState } from '../types';
+import type { AnalysisResults, Citation, Finding, Requirement, AgendaItem, PipelineStageState } from '../types';
 import { CORPUS_FILES, getPrefixedCorpus, verifyCitationAgainstSource, verifyRequirementSource, SAMPLE_RESULTS } from '../data/corpus';
 
 export interface RunPipelineOptions {

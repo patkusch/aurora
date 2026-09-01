@@ -299,7 +299,10 @@ Return ONLY a valid JSON array of agenda items:
       if (file) {
         const lines = file.split('\n');
         const line = lines[cit.line - 1] || '';
-        if (line.toLowerCase().includes(cit.verbatim_excerpt.toLowerCase().trim())) {
+        const excerpt = (cit.verbatim_excerpt || '').toLowerCase().trim();
+        // Every line contains the empty string, so an excerpt the model omitted
+        // would otherwise be counted as a verified citation.
+        if (excerpt && line.toLowerCase().includes(excerpt)) {
           cit.verified = true;
           verifiedCitations++;
         }

@@ -14,13 +14,18 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: npm
 
       - run: npm ci
 
       - name: Type check
         run: npm run lint
+
+      # Node 24 strips TypeScript natively, so the suite runs the real modules
+      # with no build step and no test-only transform in between.
+      - name: Provenance verification tests
+        run: npm test
 
       - name: Corpus provenance is consistent across app and CLI
         run: npm run check:corpus

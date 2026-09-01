@@ -1,4 +1,4 @@
-import { CorpusFile, AnalysisResults, Citation, Requirement } from '../types';
+import type { CorpusFile, AnalysisResults, Citation, Requirement } from '../types';
 
 export const CORPUS_FILES: Record<string, CorpusFile> = {
   'FDS-DM-04_Allergy_Data_Migration.md': {
@@ -178,7 +178,16 @@ export function verifyCitationAgainstSource(citation: Citation): { verified: boo
   const normalizedActual = actualLine.trim().toLowerCase();
   const normalizedExcerpt = citation.verbatim_excerpt.trim().toLowerCase();
 
-  const isMatch = normalizedActual.includes(normalizedExcerpt) || 
+  // Both directions of containment go vacuously true against an empty string,
+  // and the corpus is markdown — it is mostly blank lines. So a fabricated quote
+  // pointing at any blank line verified, and an empty excerpt verified against
+  // any line in the corpus. Either one turns "verified in code" into a badge that
+  // means nothing, which is worse than not having it.
+  if (!normalizedActual || !normalizedExcerpt) {
+    return { verified: false, actualLineText: actualLine };
+  }
+
+  const isMatch = normalizedActual.includes(normalizedExcerpt) ||
                   normalizedExcerpt.includes(normalizedActual) ||
                   // Handle fuzzy substring containment
                   normalizedActual.replace(/\s+/g, ' ').includes(normalizedExcerpt.replace(/\s+/g, ' '));
@@ -213,7 +222,7 @@ export const SAMPLE_RESULTS: AnalysisResults = {
   timestamp: new Date().toISOString(),
   engine: 'GEMINI_CLOUD',
   execution_time_ms: 1840,
-  citations_verified: 9,
+  citations_verified: 11,
   citations_rejected: 0,
   requirements_verified: 11,
   requirements_unverified: 0,
