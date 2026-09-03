@@ -1,3 +1,5 @@
+> **Successor:** Aurora has been rebuilt as [**HAZLOG**](https://github.com/patkusch/hazlog), which treats a cross-document contradiction as a DCB0160 clinical hazard, runs the cross-reading on a local model so the corpus never leaves the machine, and outputs a hazard log entry for a Clinical Safety Officer to sign. This repo is kept as submitted.
+
 <div align="center">
 
 # Aurora
