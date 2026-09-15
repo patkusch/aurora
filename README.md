@@ -287,11 +287,89 @@ Set `GEMINI_API_KEY` as an environment variable on the host. Never commit it —
 
 **Hybrid on-device extraction.** A real migration corpus contains clinical workflows, staff names and sample patient identifiers, which is why organisations of this size are reluctant to put one through a cloud API. The intended architecture runs extraction and PII flagging locally via Ollama, so only de-identified requirement objects — a few KB of JSON — leave the machine, while cross-document reasoning stays on Flash. The routing and automatic cloud fallback are implemented in [`server.ts`](./server.ts); the local branch is not yet validated end-to-end, and every run in this repository executed fully on Gemini.
 
+*Update, 15 September 2026: the local path has now been tested. See [Local Gemma path: tested 15 September 2026](#local-gemma-path-tested-15-september-2026).*
+
 **Live ingestion** from Confluence, Jira and Teams, so the conflict set updates as requirements change rather than being a point-in-time audit.
 
 **Multimodal extraction** from BPMN, Visio and legacy screenshots, which make up a large fraction of any real corpus.
 
 **Confidence weighting** to separate a hard contradiction from an ambiguity a human should adjudicate.
+
+---
+
+## Local Gemma path: tested 15 September 2026
+
+The write-up above was submitted before the local Gemma path had ever been run. It is kept as it was. This section records the first real test of that path. It was run three times through a test script and once through the app.
+
+### What was run
+
+- **Machine:** a MacBook with an Apple M5 chip and 16 GB of memory.
+- **Model:** `gemma3` 4B, the compressed version, served by Ollama 0.33.3. It is a 3.3 GB download.
+- **Why not `gemma4`, the model the code asked for:** its smallest version is a 7.2 GB download, too big for this test.
+- **How:** the app was started with `npm run dev`, the **Local Gemma** switch was turned on, and the bundled demo corpus was analysed.
+
+### As submitted, it did not work
+
+Three bugs stopped it. None of them showed an error. All three are fixed in commit `1544311`, with tests.
+
+1. **The model name was fixed to `gemma4`.** If that model was not installed, the app quietly used Gemini instead. You can now choose the model with `AURORA_GEMMA_MODEL`, and a missing model shows a warning that says how to fix it.
+2. **Half the corpus was thrown away.** Ollama gives a model room for 4,096 tokens unless told otherwise. A token is roughly three-quarters of a word. The demo prompt is 4,691 tokens, so Ollama kept only the last 2,051 and dropped the rest. The reply was then cut off halfway and nothing could be read from it. The app now asks for enough room.
+3. **Correct line numbers were rejected.** Gemma writes line numbers as text, like `"12"`. The citation checker needs a real number, so it rejected all 13 requirements Gemma found, even though every one pointed at the right line. The app now reads that text as a number.
+
+### Only the first pass runs locally
+
+The local path moves one step onto Gemma: pulling requirements out of the documents (Pass 1). Finding conflicts (Pass 2) and writing the agenda (Pass 3) always use Gemini. So the local path still needs a Gemini key. No key was available for this test, so the app stopped after Pass 1 with `GEMINI_API_KEY is not set`. That is how it was designed, not a bug.
+
+### Pass 1 on gemma3 4B
+
+It was run four times: three times directly, and once through the app itself. All four gave the same result.
+
+| | Gemini 3.7 Flash (documented above) | gemma3 4B, local | What it means |
+|:--|:--|:--|:--|
+| Time | 24–28 s for all three passes | 135–140 s for Pass 1 alone | The first step alone took five times as long as Gemini's whole run. |
+| Requirements | 31–32 | 45 | More is not better here. See the next two rows. |
+| Files read | 4 of 4 | 1 of 4 | Gemma copied out the first design document line by line, then stopped. |
+| Chat messages used | yes | none | The pharmacy decision made in Teams was never seen. |
+| Line numbers that exist | all | 45 of 45 | Every line cited is real. But 12 of the 45 are blank lines, not requirements. |
+
+### Would Gemma manage the conflict step?
+
+The app does not do this. It was run separately to answer the question. Aurora's own Pass 2 prompt was sent to gemma3 4B along with Gemma's Pass 1 output. Every citation was then checked with the app's own checker.
+
+| | Gemini 3.7 Flash (documented above) | gemma3 4B, local | What it means |
+|:--|:--|:--|:--|
+| Time | inside the 24–28 s run | 41–43 s | Slower, but workable. |
+| Findings | 5 | 4 | Gemma missed one finding. |
+| Headline conflict (F-01: allergy panel full vs empty at go-live) | found | **missed** | Gemma missed the conflict the whole demo is built around. |
+| Severity conflict (F-02) | found | found, both quotes verified | Gemma's one fully backed finding. |
+| Chat override, ward-code gap, version bump (F-03 to F-05) | found | named, but most quotes failed | The right topics, without evidence the app can show. |
+| Citations verified | 15–17 | 3–4 of 8 | About half of Gemma's quotes could be shown. |
+| Citations rejected | 0 | 4–5 of 8 | The checker caught every bad quote before it reached the screen. |
+
+Why quotes were rejected, from the first run:
+
+- Three were real sentences credited to the wrong line, two or three lines away.
+- One was a spreadsheet row credited to a design document.
+- One left out the markdown bold marks, so it no longer matched the line.
+
+In that run, no quote was made up outright. Every rejected quote came from the corpus, but with the wrong address or slightly changed wording.
+
+### Verdict
+
+- The local path now runs.
+- On gemma3 4B it is not good enough for this job: it reads one file out of four and misses the headline conflict.
+- The citation checker did its job. Nothing wrong reached the screen.
+- A larger local model may do better. That was not tested here.
+- [HAZLOG](https://github.com/patkusch/hazlog), the successor, is built around these lessons.
+
+To try it yourself:
+
+```bash
+ollama pull gemma3
+AURORA_GEMMA_MODEL=gemma3 npm run dev   # GEMINI_API_KEY is still needed for Passes 2 and 3
+```
+
+Then turn on **Local Gemma** in the header.
 
 ---
 
