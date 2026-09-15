@@ -3,6 +3,13 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
+import {
+  OLLAMA_GENERATE_URL,
+  buildOllamaRequest,
+  localModelName,
+  parseLenientJson,
+  readOllamaResult,
+} from './src/services/localExtraction.ts';
 
 dotenv.config();
 
@@ -12,46 +19,6 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: '10mb' }));
-
-// Helper to extract JSON from model responses (lenient parser with fence removal & brace extraction)
-function parseLenientJson<T>(rawText: string, fallback: T): T {
-  try {
-    if (!rawText) return fallback;
-
-    let clean = rawText.trim();
-    // Remove markdown code fences ```json ... ``` or ``` ... ```
-    if (clean.startsWith('```')) {
-      clean = clean.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
-    }
-
-    // Try direct parse
-    try {
-      return JSON.parse(clean);
-    } catch {
-      // Find first [ or { and last ] or }
-      const firstBracket = clean.indexOf('[');
-      const firstBrace = clean.indexOf('{');
-      let startIdx = -1;
-      let endIdx = -1;
-
-      if (firstBracket !== -1 && (firstBrace === -1 || firstBracket < firstBrace)) {
-        startIdx = firstBracket;
-        endIdx = clean.lastIndexOf(']');
-      } else if (firstBrace !== -1) {
-        startIdx = firstBrace;
-        endIdx = clean.lastIndexOf('}');
-      }
-
-      if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-        const substring = clean.substring(startIdx, endIdx + 1);
-        return JSON.parse(substring);
-      }
-    }
-  } catch (err) {
-    console.error('Failed to parse JSON response leniently:', err);
-  }
-  return fallback;
-}
 
 // Lazy Gemini client helper
 function getGeminiClient(): GoogleGenAI {
@@ -93,25 +60,27 @@ app.post('/api/analyse', async (req, res) => {
     let pass1RanOnLocal = false;
 
     if (useLocalGemma) {
+      const localModel = localModelName();
       try {
-        console.log('Attempting Pass 1 on local Ollama endpoint...');
-        const ollamaRes = await fetch('http://localhost:11434/api/generate', {
+        console.log(`Attempting Pass 1 on local Ollama endpoint (${localModel})...`);
+        const localStart = Date.now();
+        const ollamaRes = await fetch(OLLAMA_GENERATE_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'gemma4',
-            prompt: `Extract every atomic requirement from these corpus lines:\n${prefixedCorpus}\nFormat as JSON array of {id, text, source_file, source_line, author, date, status, workstream}.`,
-            stream: false
-          })
+          body: JSON.stringify(buildOllamaRequest(prefixedCorpus, localModel))
         });
+        const ollamaData = await ollamaRes.json().catch(() => ({}));
+        const outcome = readOllamaResult(ollamaRes.status, ollamaData, localModel);
 
-        if (ollamaRes.ok) {
-          const ollamaData = await ollamaRes.json();
-          extractedRequirements = parseLenientJson(ollamaData.response, []);
-          if (extractedRequirements.length > 0) {
-            pass1RanOnLocal = true;
-            engine = 'GEMMA_LOCAL';
-          }
+        if (outcome.warning) {
+          console.warn(outcome.warning);
+          engine = 'GEMMA_FALLBACK';
+          warnings.push(outcome.warning);
+        } else {
+          extractedRequirements = outcome.requirements;
+          pass1RanOnLocal = true;
+          engine = 'GEMMA_LOCAL';
+          console.log(`Pass 1 ran on local ${localModel}: ${extractedRequirements.length} requirements in ${((Date.now() - localStart) / 1000).toFixed(1)}s.`);
         }
       } catch (ollamaErr: any) {
         console.warn('Local Ollama extraction failed, falling back to Gemini 3.7 Flash:', ollamaErr.message);
