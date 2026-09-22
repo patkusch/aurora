@@ -287,7 +287,7 @@ Set `GEMINI_API_KEY` as an environment variable on the host. Never commit it —
 
 **Hybrid on-device extraction.** A real migration corpus contains clinical workflows, staff names and sample patient identifiers, which is why organisations of this size are reluctant to put one through a cloud API. The intended architecture runs extraction and PII flagging locally via Ollama, so only de-identified requirement objects — a few KB of JSON — leave the machine, while cross-document reasoning stays on Flash. The routing and automatic cloud fallback are implemented in [`server.ts`](./server.ts); the local branch is not yet validated end-to-end, and every run in this repository executed fully on Gemini.
 
-*Update, 15 September 2026: the local path has now been tested. See [Local Gemma path: tested 15 September 2026](#local-gemma-path-tested-15-september-2026).*
+*Update, 15 September 2026: the local path has now been tested. See [Local Gemma path: tested 15 September 2026](#local-gemma-path-tested-15-september-2026). Update, 21 September 2026: the larger 12B model was tried too — see [gemma3 12B: tested 21 September 2026](#gemma3-12b-tested-21-september-2026). It reads more of the corpus but has the same citation-accuracy problem, so the conclusion is unchanged.*
 
 **Live ingestion** from Confluence, Jira and Teams, so the conflict set updates as requirements change rather than being a point-in-time audit.
 
@@ -354,19 +354,51 @@ Why quotes were rejected, from the first run:
 
 In that run, no quote was made up outright. Every rejected quote came from the corpus, but with the wrong address or slightly changed wording.
 
+### gemma3 12B: tested 21 September 2026
+
+The verdict below said a larger local model might do better. It had been downloaded but not tried. This section is that test, on the same machine, through the same code, using the app's own request and its own checker — not a separate harness.
+
+Pass 1 was run three times directly against the model, the same way as the 4B test. All three runs agreed exactly: 14 requirements, from 2 of the 4 files, none from the Teams chat, every requirement's line number real. That is better than 4B's one file, but the two files it never reads — the field-mapping spreadsheet and the chat export — are exactly where the demo's chat-override and orphan-dependency findings live, so nothing built on Pass 1 alone can see them either.
+
+| | Gemini 3.7 Flash (documented above) | gemma3 4B | gemma3 12B |
+|:--|:--|:--|:--|
+| Time | 24–28 s for all three passes | 135–140 s for Pass 1 alone | 143–165 s for Pass 1 alone |
+| Requirements | 31–32 | 45 | 14 (identical across all 3 runs) |
+| Files read | 4 of 4 | 1 of 4 | 2 of 4 |
+| Chat messages used | yes | none | none |
+| Line numbers that exist | all | 45 of 45 | 14 of 14 |
+
+Pass 2 was then sent the third run's Pass 1 output, the same way as the 4B test — Aurora's own Pass 2 prompt, checked with the app's own citation checker.
+
+| | Gemini 3.7 Flash | gemma3 4B | gemma3 12B |
+|:--|:--|:--|:--|
+| Time | inside the 24–28 s run | 41–43 s | 123 s |
+| Findings | 5 | 4 | 4 |
+| Headline conflict (F-01: allergy panel populated vs empty at go-live) | found, citing DM-04-R03 and CLIN-11-R01 | missed | **found the same contradiction, citing different lines** |
+| Citations verified | 15–17 | 3–4 of 8 | 3 of 8 |
+| Citations rejected | 0 | 4–5 of 8 | 5 of 8 |
+
+12B's headline finding is real, but it is not the one the corpus plants: instead of the two requirement lines written to collide (`DM-04-R03`, line 34: "rendered immediately visible... upon initial user login at go-live" vs `CLIN-11-R01`, line 78: "shall be unpopulated and empty at go-live"), it cited each document's executive-summary sentence — DM-04 line 14 and CLIN-11 line 11 — which state the same contradiction in different words and both verified as real, exact quotes. A person reading it would recognise the same safety conflict; it is not the specific requirement pair the demo is built to test recognition of, so it is graded here as adjacent, not a plain miss.
+
+The other three findings repeat 4B's exact failure modes, on real quotes from the real corpus, not inventions:
+
+- **Wrong line, right person's decision.** The severity-cancellation finding (F-02) quoted "Marcus Brody: ... We can't derive severity from free text" as Teams line 3. Line 3 is real, but it is Dr. Eleanor Vance making a related point — Marcus Brody's actual message is two lines later. Same mistake the 4B write-up described: a real sentence, credited to the wrong line.
+- **Markdown broke the match.** F-03 cited `**Version:** 1.0 (Final Approved)` as plain `Version: 1.0 (Final Approved)` — the same bold-marker mismatch the 4B run hit.
+- **A citation that does not match the file at all.** F-04's spreadsheet quote does not appear anywhere in `DM_Field_Mapping_v7.csv`; the real line 12 is an unrelated row. Pass 1 never read this file, and Pass 2 did not recover it correctly from the full corpus it was given either.
+
 ### Verdict
 
-- The local path now runs.
-- On gemma3 4B it is not good enough for this job: it reads one file out of four and misses the headline conflict.
-- The citation checker did its job. Nothing wrong reached the screen.
-- A larger local model may do better. That was not tested here.
+- The local path now runs, on both sizes tested.
+- 12B reads more of the corpus than 4B (2 of 4 files against 1 of 4) and, unlike 4B, surfaces a verified, real version of the headline conflict — but not the planted citation pair, and it still never reads the spreadsheet or the chat export through Pass 1.
+- The failure modes are the same at both sizes: right topic, wrong line. Going from 4B to 12B changed how much of the corpus got read, not the citation-accuracy problem.
+- The citation checker did its job at both sizes. Nothing wrong reached the screen.
 - [HAZLOG](https://github.com/patkusch/hazlog), the successor, is built around these lessons.
 
 To try it yourself:
 
 ```bash
-ollama pull gemma3
-AURORA_GEMMA_MODEL=gemma3 npm run dev   # GEMINI_API_KEY is still needed for Passes 2 and 3
+ollama pull gemma3       # or: ollama pull gemma3:12b
+AURORA_GEMMA_MODEL=gemma3 npm run dev   # or AURORA_GEMMA_MODEL=gemma3:12b — GEMINI_API_KEY is still needed for Passes 2 and 3
 ```
 
 Then turn on **Local Gemma** in the header.
