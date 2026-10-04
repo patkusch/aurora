@@ -231,7 +231,7 @@ Every step below was executed against a clean checkout: `npm install` (0 vulnera
 HTTP 200 on port 3000. Without a key, `npm run analyse` exits with a plain
 `GEMINI_API_KEY environment variable is not set` rather than a stack trace.
 
-**Prerequisites** — Node.js 18+ and a Gemini API key.
+**Prerequisites** — Node.js 22 or later (CI runs 22, 24 and 26) and a Gemini API key.
 
 ```bash
 npm install
