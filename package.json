@@ -2,6 +2,10 @@
   "name": "aurora-requirements-conflict-engine",
   "private": true,
   "version": "0.0.0",
+  "author": "patkusch",
+  "repository": { "type": "git", "url": "git+https://github.com/patkusch/aurora.git" },
+  "homepage": "https://github.com/patkusch/aurora#readme",
+  "bugs": { "url": "https://github.com/patkusch/aurora/issues" },
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
