@@ -1,6 +1,7 @@
 {
   "name": "aurora-requirements-conflict-engine",
   "private": true,
+  "engines": { "node": ">=22" },
   "version": "0.0.0",
   "author": "patkusch",
   "repository": { "type": "git", "url": "git+https://github.com/patkusch/aurora.git" },
