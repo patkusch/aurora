@@ -19,7 +19,7 @@
     "check:corpus": "node scripts/check-corpus-sync.mjs"
   },
   "dependencies": {
-    "@google/genai": "^2.4.0",
+    "@google/genai": "^2.32.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "lucide-react": "^0.577.0",
@@ -32,8 +32,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
-    "autoprefixer": "^10.4.21",
-    "esbuild": "^0.25.0",
+    "autoprefixer": "^10.6.2",
+    "esbuild": "^0.28.2",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.9.3",
