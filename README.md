@@ -159,7 +159,7 @@ That boundary is the product thesis, not a caveat bolted onto it. Verifying prov
 ### The verifier is itself tested — and it was wrong
 
 A verification claim is only worth what the verifier is worth, so it now has a suite of
-its own (22 of the 31 cases in `npm test`, which runs in CI). Most of them are attempts to get a fabricated
+its own (22 of the 40 cases in `npm test`, which runs in CI). Most of them are attempts to get a fabricated
 citation past it: invented filenames, lines past end-of-file, line 0, quotes that
 appear nowhere, and one invented sentence swept across **every line of every file** with
 the assertion that nothing accepts it.
