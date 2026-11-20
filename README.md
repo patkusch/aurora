@@ -422,3 +422,7 @@ Fully synthetic, authored from scratch. **No real client data.** The demo domain
 ## License
 
 MIT — see [LICENSE](./LICENSE).
+
+---
+
+[Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Security policy](SECURITY.md)
